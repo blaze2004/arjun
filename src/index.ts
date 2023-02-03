@@ -1,45 +1,28 @@
-import express from "express";
+import { Client, Message } from 'whatsapp-web.js';
+import QRCode from "qrcode-terminal";
 
-const app=express();
-const port=8000||process.env.PORT;
+const client: Client=new Client({});
 
-app.get("/", (req, res) => {
-    res.send("Hi!");
-});
-
-app.listen(port, () => {
-    // tslint:disable-next-line:no-console
-    console.log(`server started at http://localhost:${port}`);
-});
-
-/*
-const { Client } = require('whatsapp-web');
-const qrcode = require('qrcode-terminal');
-
-const client = new Client(
-    {
-        puppeteer: {
-            args: ['--no-sandbox'],
-        }
-    }
-);
-
-client.on('qr', (qr: any) => {
-    // Generate and scan this code with your phone
-    qrcode.generate(qr, {small: true});
-    console.log('QR RECEIVED', qr);
+client.on('qr', (qr: string) => {
+    QRCode.generate(qr, { small: true });
+    console.log('QR code recieved.', qr);
 });
 
 client.on('ready', () => {
-    console.log('Client is ready!');
+    console.log("Client is ready.");
 });
 
+client.on('disconnected', (reason) => {
+    client.destroy();
+    console.log('Client was logged out', reason);
+});
 
-client.on('message', (msg: any) => {
-    if (msg.body == '!ping') {
+client.on('message', (msg: Message) => {
+    if (msg.body==='!ping') {
         msg.reply('pong');
+    } else {
+        console.log(msg.body);
     }
 });
 
 client.initialize();
-*/

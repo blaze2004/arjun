@@ -1,2 +1,2 @@
 # TaskMaster
-A whatsapp bot to manage your schedule on the go.
+A WhatsApp bot based on IBM Watson Assistant to manage your schedule on the go.
