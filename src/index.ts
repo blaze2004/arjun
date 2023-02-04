@@ -1,6 +1,7 @@
 import * as WAWebJS from 'whatsapp-web.js';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
+import { TMessage, UserObject } from './types';
 
 const client = new Client({
   puppeteer: {
@@ -26,11 +27,16 @@ client.on('disconnected', (reason: WAWebJS.WAState) => {
   console.log('Client was logged out', reason);
 });
 
-client.on('message', (msg: WAWebJS.Message) => {
-  if (msg.body === '!ping') {
-    msg.reply('pong');
+client.on('message', (message: TMessage) => {
+  const userObj: UserObject = {
+    name: message._data.notifyName,
+    chatId: message.author || '',
+    body: message.body,
+  };
+  if (userObj.body === '!ping') {
+    message.reply('pong');
   } else {
-    console.log(msg.body);
+    console.log(userObj.body);
   }
 });
 
