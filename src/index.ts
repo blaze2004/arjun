@@ -1,9 +1,12 @@
-import * as WAWebJS from 'whatsapp-web.js';
+import { WAState } from 'whatsapp-web.js';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
-import { TMessage, UserObject } from './types';
+import { processMessage } from './actions/processMessage';
+import dotenv from 'dotenv';
 
-const client = new Client({
+dotenv.config();
+
+export const client: Client = new Client({
   puppeteer: {
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -22,22 +25,11 @@ client.on('ready', () => {
   console.log('Client is ready.');
 });
 
-client.on('disconnected', (reason: WAWebJS.WAState) => {
+client.on('disconnected', (reason: WAState) => {
   client.destroy();
   console.log('Client was logged out', reason);
 });
 
-client.on('message', (message: TMessage) => {
-  const userObj: UserObject = {
-    name: message._data.notifyName,
-    chatId: message.author || '',
-    body: message.body,
-  };
-  if (userObj.body === '!ping') {
-    message.reply('pong');
-  } else {
-    console.log(userObj.body);
-  }
-});
+client.on('message', processMessage);
 
 client.initialize();
