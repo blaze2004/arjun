@@ -1,4 +1,4 @@
-import { WAState } from 'whatsapp-web.js';
+import { WAState, ClientOptions } from 'whatsapp-web.js';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import { processMessage } from './actions/processMessage';

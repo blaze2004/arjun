@@ -14,9 +14,9 @@ export type UserObject = {
   // more types
 }
 
-export type WatsonReply = {
-  response_type: string;
-}
+// export type WatsonReply = {
+//  response_type: string;
+// }
 
 export type WatsonTextReply = {
   response_type: string;
@@ -32,5 +32,8 @@ export type WatsonSuggestion = {
 export type WatsonSuggestionReply = {
   reponse_type: string;
   title: string;
-  suggestions: Array<WatsonSuggestion>;
+  suggestions: WatsonSuggestion[];
+  name: string | number;
 }
+
+export type WatsonReply = WatsonTextReply | WatsonSuggestionReply;

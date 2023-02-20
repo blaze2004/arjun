@@ -1,4 +1,4 @@
-import { WatsonReply, WatsonSuggestionReply, WatsonTextReply } from "../types";
+import { WatsonReply, WatsonSuggestionReply, WatsonTextReply } from '../types';
 
 const parseWatsonResponse = () => {
 }
