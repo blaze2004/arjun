@@ -1,39 +1,33 @@
-import * as WAWebJS from 'whatsapp-web.js';
+import { Message, MessageContent } from 'whatsapp-web.js';
 
-export interface TMessage extends WAWebJS.Message {
+export interface WaBotMessage extends Message {
   _data?: {
     notifyName?: string;
   };
 }
 
-
-export type UserObject = {
+export interface MessageSender {
   name?: string;
   chatId: string;
-  body: WAWebJS.MessageContent
-  // more types
+  body: MessageContent
+  // More properties
 }
 
-// export type WatsonReply = {
-//  response_type: string;
-// }
-
-export type WatsonTextReply = {
-  response_type: string;
-  text: string
+export interface User {
+  name?: string;
+  phone: string;
+  processId: string | null;
 }
 
-export type WatsonSuggestion = {
-  label: string;
-  value: object;
-  output: object;
-  dialog_node?: string
-}
-export type WatsonSuggestionReply = {
-  reponse_type: string;
-  title: string;
-  suggestions: WatsonSuggestion[];
-  name: string | number;
+export interface Question {
+  question: string;
+  answer: string | null;
+  errorMsg?: string;
+  validateAnswer: (answer: string) => Promise<boolean> | boolean;
 }
 
-export type WatsonReply = WatsonTextReply | WatsonSuggestionReply;
+declare module 'express-session' {
+  export interface SessionData {
+    user: User;
+  }
+}

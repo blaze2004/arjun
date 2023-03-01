@@ -1,0 +1,14 @@
+import { config } from "dotenv";
+
+if (process.env.NODE_ENV!=='production') {
+    config();
+}
+
+const environmentVariables={
+    port: process.env.PORT||3000,
+    nodeEnv: process.env.NODE_ENV,
+    sessionSecret: process.env.SESSION_SECRET||"temperory_development_secret",
+    databaseUrl: process.env.DATABASE_URL,
+};
+
+export default environmentVariables;

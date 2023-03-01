@@ -1,11 +1,20 @@
-import { WAState, ClientOptions } from 'whatsapp-web.js';
-import { Client, LocalAuth } from 'whatsapp-web.js';
+import express from 'express';
+import session from 'express-session';
+import { WAState, Events, Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
-import { processMessage } from './actions/processMessage';
-import dotenv from 'dotenv';
+import getMessage from './actions/conversation/getMessage';
+import { sessionConfig } from './utils/sessionManager';
+import environmentVariables from './utils/config';
 
-dotenv.config();
+const app = express();
 
+// Session Middleware
+app.use(session(sessionConfig));
+
+app.listen(environmentVariables.port, () => console.log("Server is up adnd running!"));
+
+
+// WhatsApp Web Js Configuration
 export const client: Client = new Client({
   puppeteer: {
     headless: true,
@@ -16,20 +25,20 @@ export const client: Client = new Client({
   }),
 });
 
-client.on('qr', (qr: string) => {
+client.on(Events.QR_RECEIVED, (qr: string) => {
   qrcode.generate(qr, { small: true });
   console.log('QR code recieved.', qr);
 });
 
-client.on('ready', () => {
+client.on(Events.READY, () => {
   console.log('Client is ready.');
 });
 
-client.on('disconnected', (reason: WAState) => {
+client.on(Events.DISCONNECTED, (reason: WAState) => {
   client.destroy();
   console.log('Client was logged out', reason);
 });
 
-client.on('message', processMessage);
+client.on(Events.MESSAGE_RECEIVED, getMessage);
 
 client.initialize();
