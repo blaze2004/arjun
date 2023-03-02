@@ -1,10 +1,11 @@
 import { Request } from "express";
 import { ChatCompletionRequestMessage } from "openai";
+import ChatGPTRole from "../../constants/prompt";
 import openai from "../../utils/openai";
 
 export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], req: Request): ChatCompletionRequestMessage[] => {
-    let chatGPTPrompt: ChatCompletionRequestMessage[] = [
-        { role: 'system', content: "You are Arjun, an ai chatbot which helps users manage their schedule and answer general queries." },
+    const chatGPTPrompt: ChatCompletionRequestMessage[] = [
+        { role: 'system', content: ChatGPTRole },
         ...chatHistory,
     ];
 
