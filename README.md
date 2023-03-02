@@ -6,7 +6,7 @@ With natural language processing capabilities, users can send messages to Arjun 
 Arjun brings the convenience of AI-powered tools to WhatsApp users.
 
 ## Getting Started
-To get started locally, create a meta developer account and create an app and add whatsapp in the services of the app.
+To get started locally.
 
 * Clone this repo locally
 * Then create your environment variables. (Make sure to create a table named ```wa_bot_user_sessions``` in your postgresql database.)
