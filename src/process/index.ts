@@ -37,7 +37,7 @@ abstract class Process {
 
     async postProcessAction(req: Request): Promise<string[]> {
         await req.saveUserSession(req.user);
-        ProcessManager.destroyProcess(this.pid, req);
+        await ProcessManager.destroyProcess(this.pid, req);
 
         return [replies.welcomeMessage as string];
     }

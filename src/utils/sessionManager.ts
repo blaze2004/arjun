@@ -28,7 +28,15 @@ export const saveUserSession = (req: Request) => (user: User) => {
 
 const genId = (req: Request) => {
 
-    // check if user number is available return that
+    if (req && req.body) {
+        if (
+            req.body.object &&
+            req.body.messageObj
+        ) {
+            const customerPhoneNumber: string = req.body.messageObj.phone;
+            return customerPhoneNumber;
+        }
+    }
 
     return randomUUID();
 }
@@ -43,4 +51,37 @@ export const sessionConfig: SessionOptions = {
     cookie: {
         secure: environmentVariables.nodeEnv === "production",
     }
+};
+
+export const sessionMiddleware = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    if (req && req.body) {
+        if (
+            req.body.object &&
+            req.body.messageObj
+        ) {
+            const customerPhoneNumber: string = req.body.messageObj.phone;
+
+            const session = await new Promise((resolve, reject) => {
+                req.sessionStore.get(customerPhoneNumber, (error, session) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(session);
+                    }
+                });
+            });
+
+            if (session) {
+                req.session.user = (session as SessionData).user;
+                req.session.cookie = (session as SessionData).cookie;
+            }
+        }
+    }
+    req.user = req.session.user!;
+    req.saveUserSession = saveUserSession(req);
+    next();
 };

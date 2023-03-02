@@ -8,7 +8,7 @@ class UserOnboarding extends Process {
         super(pid);
         this.questions = [
             {
-                question: "Hi There!😁💙 \n\nI am FinoBird Assistant. I'll provide you with the most up-to-date and accurate infomation on listed stocks of your favourite company.\n\n*May I know your name?*",
+                question: "Hi There!😁💙 \n\nI am Arjun. I can help you manage your schedule and answer your general queries.\n\n*May I know your name?*",
                 validateAnswer: (answer: string) => answer.length > 0,
                 errorMsg: "Please enter a valid name",
                 answer: null

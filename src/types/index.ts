@@ -1,3 +1,4 @@
+import { ChatCompletionRequestMessage } from 'openai';
 import { Message, MessageContent } from 'whatsapp-web.js';
 
 export interface WaBotMessage extends Message {
@@ -17,6 +18,7 @@ export interface User {
   name?: string;
   phone: string;
   processId: string | null;
+  chatHistory: ChatCompletionRequestMessage[];
 }
 
 export interface Question {
