@@ -9,7 +9,7 @@ Arjun brings the convenience of AI-powered tools to WhatsApp users.
 To get started locally, create a meta developer account and create an app and add whatsapp in the services of the app.
 
 * Clone this repo locally
-* Then create your environment variables and start the server.
+* Then create your environment variables. (Make sure to create a table named ```wa_bot_user_sessions``` in your postgresql database.)
 ```
 cp .example.env .env
 ```
