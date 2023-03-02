@@ -1,11 +1,10 @@
 import { Request } from "express";
 import { ChatCompletionRequestMessage } from "openai";
-import environmentVariables from "../../utils/config";
 import openai from "../../utils/openai";
 
 export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], req: Request): ChatCompletionRequestMessage[] => {
     let chatGPTPrompt: ChatCompletionRequestMessage[] = [
-        { role: 'system', content: "You are arjun (made by Shubham Tiwari) an ai chatbot which helps users manage their schedule and answer general queries." },
+        { role: 'system', content: "You are arjun an ai chatbot which helps users manage their schedule and answer general queries." },
         ...chatHistory,
     ];
 
