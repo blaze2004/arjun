@@ -1,26 +1,20 @@
 import { Request } from "express";
 import replies from "../../constants/replies";
-import ProcessManager from "../../utils/processManager";
+import { isJSONPresent, validateSchedule } from "../../utils/messageBuilder";
 import getChatGPTResponse from "./chatGPT";
-
-
-// function isSchedulePrompt(message: string): boolean {
-//     const newsRegex = /(schedule|calendar|task|event|reminder|)/i;
-//     return newsRegex.test(message);
-// }
 
 const getContext = async (message: string, req: Request): Promise<string> => {
 
-    // if (isSchedulePrompt(message)) {
-    //     const newProcess = await ProcessManager.createProcess("schedule", req);
-    //     if (newProcess.welcomeMessage != null) {
-    //         return newProcess.welcomeMessage;
-    //     }
-    //     return replies.welcomeMessage as string;
-    // }
-
     const chatGPTResponse = await getChatGPTResponse(req.user.chatHistory, req);
     if (chatGPTResponse) {
+        const scheduleInfo = isJSONPresent(chatGPTResponse);
+        if (scheduleInfo.isJson) {
+            if (validateSchedule(scheduleInfo.data!)) {
+                // schedule the task, reminder or event
+                return scheduleInfo.data!.message as string;
+            }
+            return replies.invalidInputMessage as string;
+        }
         return chatGPTResponse as string;
     }
 

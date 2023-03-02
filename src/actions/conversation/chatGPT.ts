@@ -1,11 +1,12 @@
 import { Request } from "express";
 import { ChatCompletionRequestMessage } from "openai";
 import ChatGPTRole from "../../constants/prompt";
+import { getTodayDate } from "../../utils/messageBuilder";
 import openai from "../../utils/openai";
 
 export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], req: Request): ChatCompletionRequestMessage[] => {
     const chatGPTPrompt: ChatCompletionRequestMessage[] = [
-        { role: 'system', content: ChatGPTRole },
+        { role: 'system', content: ChatGPTRole + getTodayDate() },
         ...chatHistory,
     ];
 

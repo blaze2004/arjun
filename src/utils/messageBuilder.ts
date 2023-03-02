@@ -1,3 +1,5 @@
+import { JsonPresentResponse, ScheduleInfo } from "../types";
+
 export const toCapitalCase = (str: string): string => {
     return str.toLowerCase().replace(/(?:^|\s)\S/g, function (char) {
         return char.toUpperCase();
@@ -22,4 +24,39 @@ export const truncateString = (str: string): string => {
     }
 
     return result.trim();
+};
+
+export const isJSONPresent = (str: string): JsonPresentResponse => {
+    try {
+        const jsonList = str.match(/\{[^{}]*\}/);
+        if (jsonList != null) {
+            let obj: ScheduleInfo = JSON.parse(jsonList[0]);
+            return { isJson: true, data: obj };
+        }
+        return { isJson: false };
+    } catch (e) {
+        return { isJson: false };
+    }
+};
+
+export const getTodayDate = (): string => {
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0');
+    let yyyy = today.getFullYear();
+    return dd + '/' + mm + '/' + yyyy;
+}
+
+export const validateSchedule = (schedule: ScheduleInfo): boolean => {
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;
+
+    const isDateValid = dateRegex.test(schedule.dueDate);
+    const isTimeValid = timeRegex.test(schedule.time);
+
+    if (isDateValid && isTimeValid) {
+        return true;
+    }
+
+    return false;
 };

@@ -1,5 +1,5 @@
 import { ChatCompletionRequestMessage } from 'openai';
-import { Message, MessageContent } from 'whatsapp-web.js';
+import { Message } from 'whatsapp-web.js';
 
 export interface WaBotMessage extends Message {
   _data?: {
@@ -7,11 +7,18 @@ export interface WaBotMessage extends Message {
   };
 }
 
-export interface MessageSender {
-  name?: string;
-  chatId: string;
-  body: MessageContent
-  // More properties
+export interface JsonPresentResponse {
+  isJson: boolean;
+  data?: ScheduleInfo;
+}
+
+export interface ScheduleInfo {
+  type: string;
+  subtype: string;
+  dueDate: string;
+  time: string;
+  title: string;
+  message: string;
 }
 
 export interface User {
