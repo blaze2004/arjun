@@ -4,7 +4,7 @@ import openai from "../../utils/openai";
 
 export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], req: Request): ChatCompletionRequestMessage[] => {
     let chatGPTPrompt: ChatCompletionRequestMessage[] = [
-        { role: 'system', content: "You are arjun an ai chatbot which helps users manage their schedule and answer general queries." },
+        { role: 'system', content: "You are Arjun, an ai chatbot which helps users manage their schedule and answer general queries." },
         ...chatHistory,
     ];
 
