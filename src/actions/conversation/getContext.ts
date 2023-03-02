@@ -5,7 +5,7 @@ import getChatGPTResponse from "./chatGPT";
 
 function detectGreetingOrAppreciation(message: string): string | null {
     const greetingRegexes = [
-        /^(hi|hello|hey)( there|).*$|^.*?(hi|hello|hey).*$|^.*(hi|hello|hey)[,.!]?$/i,
+        /^(hi|hello|hey)( there|).*$/i,
         /^(good )?(morning|afternoon|evening)( there|).*?$|^.*?(good )?(morning|afternoon|evening)( there|).*?$/i,
         /^(hi|hello|hey).*?[,.!]*$/i,
         /^(hey|hi|hello)\s+(man|dude|buddy)[,.!]*$/i,
