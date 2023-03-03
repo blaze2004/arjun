@@ -1,24 +1,23 @@
 import { Request, Response } from "express";
 import replies from "../../constants/replies";
-import { WaBotMessage } from "../../types";
 import getContext from "./getContext";
 import ProcessManager from "../../utils/processManager";
-import { client } from "../..";
+import { ArjunResponse, Message } from "../../types";
 
 const getMessage = async (req: Request, res: Response) => {
 
     if (req && req.body) {
         if (
-            req.body.object &&
+            req.body.owner &&
             req.body.messageObj
         ) {
 
-            const message: WaBotMessage = req.body.messageObj.message;
+            const message: Message = req.body.messageObj;
             const user = req.user || null;
 
             if (user === null) {
                 const userSession = {
-                    phone: message.from,
+                    phone: message.phone,
                     processId: null,
                     chatHistory: [],
                 };
@@ -27,14 +26,14 @@ const getMessage = async (req: Request, res: Response) => {
                 await req.saveUserSession(userSession);
                 const newProcess = await ProcessManager.createProcess('user-onboarding', req);
                 if (newProcess.welcomeMessage != null) {
-                    await client.sendMessage(message.from, newProcess.welcomeMessage);
-                    return res.sendStatus(200);
+                    const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: newProcess.welcomeMessage }];
+                    return res.status(200).send(response);
                 }
             }
 
             if (message.body === "") {
-                await client.sendMessage(message.from, replies.invalidInputMessage as string);
-                return res.sendStatus(200);
+                const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: replies.invalidInputMessage as string }];
+                return res.status(200).send(response);
             }
 
             req.user.chatHistory.push(
@@ -50,33 +49,36 @@ const getMessage = async (req: Request, res: Response) => {
                 else {
                     const nextQuestion = await currentProcess.handleUserResponse(message.body);
                     if (nextQuestion != null) {
-                        await client.sendMessage(message.from, nextQuestion);
+                        const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: nextQuestion }];
                         req.user.chatHistory.push(
                             { role: 'assistant', content: nextQuestion }
                         );
+                        await req.saveUserSession(req.user);
+                        return res.status(200).send(response);
                     }
-                    else {
-                        const responseList = await currentProcess.postProcessAction(req);
-                        for (let i = 0; i < responseList.length; i++) {
-                            await client.sendMessage(message.from, responseList[i]);
-                            req.user.chatHistory.push(
-                                { role: 'assistant', content: responseList[i] }
-                            );
-                        }
+                    const responseList = await currentProcess.postProcessAction(req);
+                    const response: ArjunResponse[] = [];
+                    for (let i = 0; i < responseList.length; i++) {
+                        response.push(
+                            { owner: req.body.owner, isReply: false, message: responseList[i] }
+                        );
+                        req.user.chatHistory.push(
+                            { role: 'assistant', content: responseList[i] }
+                        );
                     }
                     await req.saveUserSession(req.user);
-                    return res.sendStatus(200);
+                    return res.status(200).send(response);
                 }
             }
 
             // get context from user message and initiate appropriate process
-            const response = await getContext(message.body, req);
-            await client.sendMessage(message.from, response);
+            const contextResponse = await getContext(message.body, req);
             req.user.chatHistory.push(
-                { role: 'assistant', content: response }
+                { role: 'assistant', content: contextResponse }
             );
+            const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: contextResponse }];
             await req.saveUserSession(req.user);
-            return res.sendStatus(200);
+            return res.status(200).send(response);
         }
         // Return a '404 Not Found' if data is missing
         return res.sendStatus(404);

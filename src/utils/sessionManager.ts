@@ -6,14 +6,14 @@ import { User } from "../types";
 import { randomUUID } from "crypto";
 import environmentVariables from "./config";
 
-const pgPool = new Pool({
+export const pgPool = new Pool({
     connectionString: environmentVariables.databaseUrl,
 });
 
 const pgSessionStore = pgSession(session);
 export const sessionStore = new pgSessionStore({
     pool: pgPool,
-    tableName: "wa_bot_user_sessions",
+    tableName: "user_sessions",
 });
 
 export const saveUserSession = (req: Request) => (user: User) => {
@@ -30,7 +30,7 @@ const genId = (req: Request) => {
 
     if (req && req.body) {
         if (
-            req.body.object &&
+            req.body.owner &&
             req.body.messageObj
         ) {
             const customerPhoneNumber: string = req.body.messageObj.phone;
@@ -60,7 +60,7 @@ export const sessionMiddleware = async (
 ) => {
     if (req && req.body) {
         if (
-            req.body.object &&
+            req.body.owner &&
             req.body.messageObj
         ) {
             const customerPhoneNumber: string = req.body.messageObj.phone;

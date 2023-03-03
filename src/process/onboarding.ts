@@ -17,7 +17,7 @@ class UserOnboarding extends Process {
     }
 
     async postProcessAction(req: Request) {
-        req.user.name = toCapitalCase(this.questions[0].answer!);
+        req.user.name = toCapitalCase(this.questions[0].answer || "");
         await super.postProcessAction(req);
         return [`🍻 Welcome ${req.user.name}!`, replies.userOnboardedMessage as string];
     }

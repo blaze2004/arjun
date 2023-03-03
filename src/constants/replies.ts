@@ -13,8 +13,7 @@ const unrecognizedResponses = [
 const replies: { [key: string]: string | ((name: string) => string) } = {
     welcomeMessage: "*What would you like to do now?*",
     userOnboardedMessage: "*What would you like to do now?*",
-    invalidInputMessage: unrecognizedResponses[Math.floor(Math.random() * unrecognizedResponses.length)],
-    chatLaterMessage: "Sure, I'll be here if you need me.\n\nIn the meantime, you can check out our website at https://arjun.vb.tech.",
+    invalidInputMessage: unrecognizedResponses[Math.floor(Math.random() * unrecognizedResponses.length)]
 }
 
 export default replies;
