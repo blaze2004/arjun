@@ -30,7 +30,7 @@ export const isJSONPresent = (str: string): JsonPresentResponse => {
     try {
         const jsonList = str.match(/\{[^{}]*\}/);
         if (jsonList != null) {
-            let obj: ScheduleInfo = JSON.parse(jsonList[0]);
+            const obj: ScheduleInfo = JSON.parse(jsonList[0]);
             return { isJson: true, data: obj };
         }
         return { isJson: false };
@@ -40,10 +40,10 @@ export const isJSONPresent = (str: string): JsonPresentResponse => {
 };
 
 export const getTodayDate = (): string => {
-    let today = new Date();
-    let dd = String(today.getDate()).padStart(2, '0');
-    let mm = String(today.getMonth() + 1).padStart(2, '0');
-    let yyyy = today.getFullYear();
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
     return dd + '/' + mm + '/' + yyyy;
 }
 
