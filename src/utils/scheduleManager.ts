@@ -13,9 +13,9 @@ class ScheduleManager {
 
     public async createCalendarEntry(scheduleInfo: ScheduleInfo): Promise<string> {
         let response: AddToScheduleResponse;
-        if (scheduleInfo.type==="reminder") {
+        if (scheduleInfo.subType==="reminder") {
             response=await this.createReminder(scheduleInfo);
-        } else if (scheduleInfo.type==="task") {
+        } else if (scheduleInfo.subType==="task") {
             response=await this.createTask(scheduleInfo);
         } else {
             response=await this.createEvent(scheduleInfo);
@@ -27,7 +27,7 @@ class ScheduleManager {
     private async createTask(TaskInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
         const task={
             title: TaskInfo.title,
-            due: new Date(`${TaskInfo.dueDate}T${TaskInfo.time}:00`).toISOString(),
+            due: new Date(`${TaskInfo.dueDate} ${TaskInfo.time}:00`).toISOString(),
         };
 
         try {
@@ -49,11 +49,11 @@ class ScheduleManager {
         const reminder={
             summary: ReminderInfo.title,
             start: {
-                dateTime: new Date(`${ReminderInfo.dueDate}T${ReminderInfo.time}:00`).toISOString(),
+                dateTime: new Date(`${ReminderInfo.dueDate} ${ReminderInfo.time}:00`).toISOString(),
                 timeZone: 'Asia/Kolkata',
             },
             end: {
-                dateTime: new Date(`${ReminderInfo.dueDate}T${ReminderInfo.time}:00`).toISOString(),
+                dateTime: new Date(`${ReminderInfo.dueDate} ${ReminderInfo.time}:00`).toISOString(),
                 timeZone: 'Asia/Kolkata',
             },
             reminder: {
@@ -86,11 +86,11 @@ class ScheduleManager {
         const event={
             summary: EventInfo.title,
             start: {
-                dateTime: new Date(`${EventInfo.dueDate}T${EventInfo.time}:00`).toISOString(),
+                dateTime: new Date(`${EventInfo.dueDate} ${EventInfo.time}:00`).toISOString(),
                 timeZone: 'Asia/Kolkata',
             },
             end: {
-                dateTime: new Date(`${EventInfo.dueDate}T${EventInfo.time}:00`).toISOString(),
+                dateTime: new Date(`${EventInfo.dueDate} ${EventInfo.time}:00`).toISOString(),
                 timeZone: 'Asia/Kolkata',
             },
             reminders: {
@@ -108,7 +108,7 @@ class ScheduleManager {
             return { success: true, message: EventInfo.message };
         } catch (error) {
             console.log("Error Creating Reminder", error);
-            return { success: false, message: "Error Creating Reminder" };
+            return { success: false, message: "Error Creating Event" };
         }
     }
 }

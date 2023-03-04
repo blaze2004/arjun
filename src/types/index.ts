@@ -19,7 +19,7 @@ export interface JsonPresentResponse {
 
 export interface ScheduleInfo {
   type: string;
-  subtype: string;
+  subType: string;
   dueDate: string;
   time: string;
   title: string;
