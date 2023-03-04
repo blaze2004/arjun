@@ -13,7 +13,7 @@ export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], re
     let prompt = '';
     for (let i = chatGPTPrompt.length - 1; i > 0; i--) {
         prompt += chatGPTPrompt[i].content;
-        if ((prompt.split(" ").length / 0.75) > 2500) {
+        if ((prompt.split(" ").length) > 2000) {
             const newChatHistory: ChatCompletionRequestMessage[] = chatGPTPrompt.slice(i > 1 ? i - 1 : 1, -1);
             req.user.chatHistory = newChatHistory;
             return newChatHistory;

@@ -72,11 +72,7 @@ const getMessage = async (req: Request, res: Response) => {
             }
 
             // get context from user message and initiate appropriate process
-            const contextResponse = await getContext(message.body, req);
-            req.user.chatHistory.push(
-                { role: 'assistant', content: contextResponse }
-            );
-            const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: contextResponse }];
+            const response = await getContext(message.body, req);
             await req.saveUserSession(req.user);
             return res.status(200).send(response);
         }

@@ -12,9 +12,16 @@ export interface ArjunResponse {
   isReply: boolean;
 }
 
+export interface ScheduleElement {
+  title: string;
+  dueDate: string;
+  dueTime: string;
+  type: string;
+}
+
 export interface JsonPresentResponse {
   isJson: boolean;
-  data?: ScheduleInfo;
+  data?: ChatGPTScheduleInfo;
 }
 
 export interface ScheduleInfo {
@@ -25,6 +32,16 @@ export interface ScheduleInfo {
   title: string;
   message: string;
 }
+
+export interface ScheduleView {
+  type: string;
+  eventsOnly: boolean;
+  tasksOnly: boolean;
+  all: boolean;
+  message: string;
+}
+
+export type ChatGPTScheduleInfo = ScheduleInfo | ScheduleView;
 
 export interface AddToScheduleResponse {
   success: boolean;
