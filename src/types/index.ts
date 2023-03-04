@@ -26,6 +26,11 @@ export interface ScheduleInfo {
   message: string;
 }
 
+export interface AddToScheduleResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface User {
   name?: string;
   phone: string;

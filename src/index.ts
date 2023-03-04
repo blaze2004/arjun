@@ -6,7 +6,7 @@ import environmentVariables from './utils/config';
 import bodyParser from 'body-parser';
 import checkApiKey from './utils/apiKey';
 
-const app = express();
+const app=express();
 
 app.use(bodyParser.json());
 
