@@ -23,7 +23,7 @@ const getContext = async (message: string, req: Request): Promise<ArjunResponse[
                 clientSecret: environmentVariables.googleOauthClientSecret,
                 redirectUri: environmentVariables.googleOauthRedirectUri
             });
-            oauth2Client.setCredentials({ refresh_token: '1//0g-XopBPt_3kPCgYIARAAGBASNwF-L9Irpj-XnA04en_RSCs9UUn1w61zoFjwHNoSV7MvfuaAlcZQhOmx_MAK17Gtp1CPVWSP3Mo', access_token: 'ya29.a0AVvZVsoDucezUCA3oz8NxamEwgx4kih4QC7hn9axVoqiYgX5j3Eg4aSrwxKfBel7RbHVwMdND0qTT-yx_nR_at5jDWq2_2UA-Hd94blTasRteKuFFysizchQNEfmBrpFOD8w3RBBn31f799UEXxcPz1K7vOnaCgYKAT0SARESFQGbdwaIDhI5nwSIOvgEZ9gpje72XQ0163', scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/tasks.readonly https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile" });
+            oauth2Client.setCredentials({ refresh_token: 'fetch user refresh token from  db', access_token: 'fetch user access token' });
             if (scheduleInfo.data.type === "schedule#add") {
                 scheduleInfo.data = scheduleInfo.data as ScheduleInfo;
                 if (validateSchedule(scheduleInfo.data)) {
