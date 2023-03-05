@@ -126,7 +126,7 @@ class ScheduleManager {
     // }
 
     private async createEvent(EventInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
-        const eventStartTime = convertDateTimeToISO(EventInfo.dueDate, EventInfo.time);
+        const eventStartTime = new Date((new Date(convertDateTimeToISO(EventInfo.dueDate, EventInfo.time))).getTime() - 5.5 * 60 * 60 * 1000).toISOString();
         const eventEndTime = new Date((new Date(eventStartTime)).getTime() + 60 * 60 * 1000);
 
         const event = {

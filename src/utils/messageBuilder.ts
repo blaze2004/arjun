@@ -54,7 +54,7 @@ export const isJSONPresent = (str: string): JsonPresentResponse => {
         const jsonList = str.match(/\{[^{}]*\}/);
 
         if (jsonList != null) {
-            const jsonString = jsonList[0].replace(/(['"])?([a-zA-Z0-9_]+)(['"])?:/g, '"$2": ').replace(/\bTrue\b|\bFalse\b/gi, match => match.toLowerCase());
+            const jsonString = jsonList[0].replace(/\bTrue\b|\bFalse\b/gi, match => match.toLowerCase());
             console.log(jsonString);
             let obj: ChatGPTScheduleInfo = JSON.parse(jsonString);
             console.log(obj);

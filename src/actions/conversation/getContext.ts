@@ -17,13 +17,12 @@ const getContext = async (message: string, req: Request): Promise<ArjunResponse[
     if (chatGPTResponse) {
         let scheduleInfo = isJSONPresent(chatGPTResponse);
         if (scheduleInfo.isJson && scheduleInfo.data) {
-            console.log(scheduleInfo.data);
             const oauth2Client = new google.auth.OAuth2({
                 clientId: environmentVariables.googleOauthClientID,
                 clientSecret: environmentVariables.googleOauthClientSecret,
                 redirectUri: environmentVariables.googleOauthRedirectUri
             });
-            oauth2Client.setCredentials({ refresh_token: 'fetch user refresh token from  db', access_token: 'fetch user access token' });
+            oauth2Client.setCredentials({ refresh_token: 'user refresh token fetched from database', access_token: 'user access token fetched with refresh token' });
             if (scheduleInfo.data.type === "schedule#add") {
                 scheduleInfo.data = scheduleInfo.data as ScheduleInfo;
                 if (validateSchedule(scheduleInfo.data)) {
@@ -39,7 +38,7 @@ const getContext = async (message: string, req: Request): Promise<ArjunResponse[
             } else if (scheduleInfo.data.type === "schedule#view") {
                 scheduleInfo.data = scheduleInfo.data as ScheduleView;
                 const scheduleManager = new ScheduleManager(oauth2Client);
-                const userSchedule = await scheduleManager.getSchedule({ eventsOnly: scheduleInfo.data.eventsOnly, tasksOnly: scheduleInfo.data.tasksOnly });
+                const userSchedule: ScheduleElement[] = await scheduleManager.getSchedule({ eventsOnly: scheduleInfo.data.eventsOnly, tasksOnly: scheduleInfo.data.tasksOnly });
                 if (userSchedule.length > 0) {
                     response.push({ owner: req.body.owner, isReply: false, message: "Upcoming Tasks and Events" });
                     userSchedule.forEach(scheduleItem => {
