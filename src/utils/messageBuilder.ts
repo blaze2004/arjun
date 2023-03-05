@@ -79,6 +79,21 @@ export const getTodayDate = (): string => {
     return dd + '/' + mm + '/' + yyyy;
 }
 
+export const getCurrentTime = (): string => {
+    const options = { timeZone: 'Asia/Kolkata', hour12: false };
+    const formatter = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', ...options });
+    const now = new Date();
+    return formatter.format(now);
+}
+
+
+export const convertDateTimeToISO = (dateString: string, timeString: string): string => {
+    const [day, month, year] = dateString.split('/');
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+    return date.toISOString();
+}
+
 export const validateSchedule = (schedule: ScheduleInfo): boolean => {
     const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const timeRegex = /^([01]?[0-9]|2[0-3]):([0-5][0-9])$/;

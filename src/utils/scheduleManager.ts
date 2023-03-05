@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 import { AddToScheduleResponse, ScheduleElement, ScheduleInfo } from "../types";
+import { convertDateTimeToISO } from "./messageBuilder";
 
 class ScheduleManager {
     private readonly calendar = google.calendar("v3");
@@ -101,7 +102,7 @@ class ScheduleManager {
     private async createTask(TaskInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
         const task = {
             title: TaskInfo.title,
-            due: new Date(`${TaskInfo.dueDate} ${TaskInfo.time}:00`).toISOString(),
+            due: convertDateTimeToISO(TaskInfo.dueDate, TaskInfo.time),
         };
 
         try {
@@ -125,13 +126,13 @@ class ScheduleManager {
     // }
 
     private async createEvent(EventInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
-        const eventStartTime = new Date(`${EventInfo.dueDate} ${EventInfo.time}:00`);
-        const eventEndTime = new Date(eventStartTime.getTime() + 60 * 60 * 1000);
+        const eventStartTime = convertDateTimeToISO(EventInfo.dueDate, EventInfo.time);
+        const eventEndTime = new Date((new Date(eventStartTime)).getTime() + 60 * 60 * 1000);
 
         const event = {
             summary: EventInfo.title,
             start: {
-                dateTime: eventStartTime.toISOString(),
+                dateTime: eventStartTime,
                 timeZone: 'Asia/Kolkata',
             },
             end: {
