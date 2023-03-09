@@ -53,6 +53,8 @@ export interface User {
   phone: string;
   processId: string | null;
   chatHistory: ChatCompletionRequestMessage[];
+  refreshToken?: string;
+  accessToken?: string;
 }
 
 export interface Question {

@@ -4,10 +4,11 @@ import replies from "../../constants/replies";
 import { ArjunResponse, ScheduleElement, ScheduleInfo, ScheduleView } from "../../types";
 import environmentVariables from "../../utils/config";
 import { isJSONPresent, validateSchedule } from "../../utils/messageBuilder";
+import { isAccessTokenValid } from "../../utils/oauthToken";
 import ScheduleManager from "../../utils/scheduleManager";
 import getChatGPTResponse from "./chatGPT";
 
-const getContext = async (message: string, req: Request): Promise<ArjunResponse[]> => {
+const getContext = async (req: Request): Promise<ArjunResponse[]> => {
 
     let response: ArjunResponse[] = [];
     // const token=await oauth2Client.refreshAccessToken();
@@ -22,16 +23,26 @@ const getContext = async (message: string, req: Request): Promise<ArjunResponse[
                 clientSecret: environmentVariables.googleOauthClientSecret,
                 redirectUri: environmentVariables.googleOauthRedirectUri
             });
-            oauth2Client.setCredentials({ refresh_token: 'user refresh token fetched from database', access_token: 'user access token fetched with refresh token' });
+            oauth2Client.setCredentials({ refresh_token: req.user.refreshToken, access_token: req.user.accessToken });
+
+            if (!await isAccessTokenValid(req.user.accessToken as string)) {
+                try {
+                    const newAccessToken = await oauth2Client.refreshAccessToken();
+                    req.user.accessToken = newAccessToken.credentials.access_token as string;
+                    oauth2Client.setCredentials({ refresh_token: req.user.refreshToken, access_token: newAccessToken.credentials.access_token });
+                } catch (error) {
+                    console.log("Error generating Access Token, ", error);
+                    response.push({ owner: req.body.owner, isReply: false, message: replies.internalErrorMessage as string });
+                    return response;
+                }
+            }
+
             if (scheduleInfo.data.type === "schedule#add") {
                 scheduleInfo.data = scheduleInfo.data as ScheduleInfo;
                 if (validateSchedule(scheduleInfo.data)) {
                     const scheduleManager = new ScheduleManager(oauth2Client);
                     const responseMessage = await scheduleManager.createCalendarEntry(scheduleInfo.data);
                     response.push({ owner: req.body.owner, isReply: false, message: responseMessage });
-                    req.user.chatHistory.push(
-                        { role: 'assistant', content: responseMessage }
-                    );
                     return response;
                 }
 
@@ -47,35 +58,20 @@ const getContext = async (message: string, req: Request): Promise<ArjunResponse[
                             isReply: false,
                             message: `*Type:* ${scheduleItem.type}\n*Title:* ${scheduleItem.title}\n*Due:* ${scheduleItem.dueDate} ${scheduleItem.dueTime}`
                         });
-                        req.user.chatHistory.push(
-                            { role: 'assistant', content: `*Type:* ${scheduleItem.type}\n*Title:* ${scheduleItem.title}\n*Due:* ${scheduleItem.dueDate} ${scheduleItem.dueTime}` }
-                        );
                     });
                 } else {
                     response.push({ owner: req.body.owner, isReply: false, message: 'Looks like you have a free day today! 😎 Time to put on those comfy pants, grab some popcorn 🍿, and binge-watch your favorite show 📺. Enjoy your day off!' });
-                    req.user.chatHistory.push(
-                        { role: 'assistant', content: 'Looks like you have a free day today! 😎 Time to put on those comfy pants, grab some popcorn 🍿, and binge-watch your favorite show 📺. Enjoy your day off!' }
-                    );
                 }
                 return response;
             }
             response.push({ owner: req.body.owner, isReply: false, message: replies.invalidInputMessage as string });
-            req.user.chatHistory.push(
-                { role: 'assistant', content: replies.invalidInputMessage as string }
-            );
             return response;
         }
         response.push({ owner: req.body.owner, isReply: false, message: chatGPTResponse as string });
-        req.user.chatHistory.push(
-            { role: 'assistant', content: chatGPTResponse }
-        );
         return response;
     }
 
     response.push({ owner: req.body.owner, isReply: false, message: replies.invalidInputMessage as string });
-    req.user.chatHistory.push(
-        { role: 'assistant', content: replies.invalidInputMessage as string }
-    );
     return response;
 }
 

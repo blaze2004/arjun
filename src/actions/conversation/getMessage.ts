@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import replies from "../../constants/replies";
 import getContext from "./getContext";
 import ProcessManager from "../../utils/processManager";
-import { ArjunResponse, Message } from "../../types";
+import { ArjunResponse, Message, User } from "../../types";
+import { pgPool } from "../../utils/sessionManager";
 
 const getMessage = async (req: Request, res: Response) => {
 
@@ -16,19 +17,54 @@ const getMessage = async (req: Request, res: Response) => {
             const user = req.user || null;
 
             if (user === null) {
-                const userSession = {
+                const userSession: User = {
                     phone: message.phone,
                     processId: null,
                     chatHistory: [],
+                    name: message.name
                 };
+
+                try {
+                    const query = {
+                        text: "SELECT * FROM profiles WHERE phone_number =$1",
+                        values: [userSession.phone]
+                    };
+
+                    const result = await pgPool.query(query);
+
+                    if (result.rows.length === 0) {
+                        const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: replies.unregisteredUser as string }];
+                        return res.status(200).send(response);
+                    }
+
+                    userSession.name = result.rows[0].full_name;
+                    userSession.refreshToken = "";
+                    userSession.accessToken = "";
+
+                } catch (error) {
+                    console.error(error);
+                    const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: replies.internalErrorMessage as string }];
+                    return res.status(200).send(response);
+                }
 
                 req.user = userSession;
                 await req.saveUserSession(userSession);
+                let response: ArjunResponse[] = [];
+                response.push({ owner: req.body.owner, isReply: false, message: (replies.userOnboardedMessage as ((name: string) => string))(req.user.name || "There") });
+                req.user.chatHistory.push(
+                    { role: 'assistant', content: response[0].message }
+                );
                 const newProcess = await ProcessManager.createProcess('user-onboarding', req);
                 if (newProcess.welcomeMessage != null) {
-                    const response: ArjunResponse[] = [{ owner: req.body.owner, isReply: false, message: newProcess.welcomeMessage }];
+                    response.push({ owner: req.body.owner, isReply: false, message: newProcess.welcomeMessage });
+                    req.user.chatHistory.push(
+                        { role: 'assistant', content: newProcess.welcomeMessage }
+                    );
+                    await req.saveUserSession(req.user);
                     return res.status(200).send(response);
                 }
+                await req.saveUserSession(req.user);
+                return res.status(200).send(response);
             }
 
             if (message.body === "") {
@@ -72,7 +108,10 @@ const getMessage = async (req: Request, res: Response) => {
             }
 
             // get context from user message and initiate appropriate process
-            const response = await getContext(message.body, req);
+            const response = await getContext(req);
+            response.forEach((reply: ArjunResponse) => {
+                req.user.chatHistory.push({ role: 'assistant', content: reply.message });
+            });
             await req.saveUserSession(req.user);
             return res.status(200).send(response);
         }

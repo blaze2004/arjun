@@ -8,9 +8,15 @@ class UserOnboarding extends Process {
         super(pid);
         this.questions = [
             {
-                question: "Hi There!😁💙 \n\nI am Arjun. I can help you manage your schedule and answer your general queries.\n\n*May I know your name?*",
+                question: "*What is your current profession or field of study?*",
                 validateAnswer: (answer: string) => answer.length > 0,
-                errorMsg: "Please enter a valid name",
+                errorMsg: "Please enter a valid profession.",
+                answer: null
+            },
+            {
+                question: "*Can you tell me a little more about yourself (anything you would like to tell)?*",
+                validateAnswer: (answer: string) => answer.length > 0,
+                errorMsg: "Please enter a valid profession.",
                 answer: null
             },
         ];
@@ -19,7 +25,7 @@ class UserOnboarding extends Process {
     async postProcessAction(req: Request) {
         req.user.name = toCapitalCase(this.questions[0].answer || "");
         await super.postProcessAction(req);
-        return [`🍻 Welcome ${req.user.name}!`, replies.userOnboardedMessage as string];
+        return [`🍻 Welcome ${req.user.name}!`, replies.welcomeMessage as string];
     }
 }
 
