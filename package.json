@@ -4,7 +4,7 @@
   "description": "An AI personal assistant to manage your schedule from WhatsApp.",
   "author": "Shubham Tiwari",
   "scripts": {
-    "lint": "eslint . --ext .ts --fix",
+    "prebuild": "eslint . --ext .ts --fix",
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
