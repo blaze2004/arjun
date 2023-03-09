@@ -38,7 +38,7 @@ const getMessage = async (req: Request, res: Response) => {
                     }
 
                     userSession.name = result.rows[0].full_name;
-                    userSession.refreshToken = "";
+                    userSession.refreshToken=result.rows[0].google_refresh_token;
                     userSession.accessToken = "";
 
                 } catch (error) {
