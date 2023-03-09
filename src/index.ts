@@ -24,4 +24,4 @@ app.get("/api/v1", (_req: Request, res: Response) => {
 app.post("/api/v1/chat", getMessage);
 
 // Start the server
-app.listen(environmentVariables.port, () => console.log("Server is up and running!"));
+app.listen(environmentVariables.port, () => console.log("Server is up and running!", environmentVariables));
