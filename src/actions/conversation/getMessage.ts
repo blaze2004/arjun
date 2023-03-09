@@ -3,7 +3,6 @@ import replies from "../../constants/replies";
 import getContext from "./getContext";
 import ProcessManager from "../../utils/processManager";
 import { ArjunResponse, Message, User } from "../../types";
-import { pgPool } from "../../utils/sessionManager";
 import supabase from "../../utils/supabaseClient";
 
 const getMessage=async (req: Request, res: Response) => {
@@ -27,7 +26,7 @@ const getMessage=async (req: Request, res: Response) => {
 
                 try {
 
-                    let { data, error, status }=await supabase
+                    const { data, error, status }=await supabase
                         .from("profiles")
                         .select(`full_name, phone_number, google_refresh_token`)
                         .eq("phone_number", userSession.phone)
@@ -56,7 +55,7 @@ const getMessage=async (req: Request, res: Response) => {
 
                 req.user=userSession;
                 await req.saveUserSession(userSession);
-                let response: ArjunResponse[]=[];
+                const response: ArjunResponse[]=[];
                 response.push({ owner: req.body.owner, isReply: false, message: (replies.userOnboardedMessage as ((name: string) => string))(req.user.name||"There") });
                 req.user.chatHistory.push(
                     { role: 'assistant', content: response[0].message }

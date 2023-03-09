@@ -1,4 +1,4 @@
-import { ChatGPTScheduleInfo, JsonPresentResponse, ScheduleInfo, ScheduleView } from "../types";
+import { ChatGPTScheduleInfo, JsonPresentResponse, ScheduleInfo } from "../types";
 
 export const toCapitalCase = (str: string): string => {
     return str.toLowerCase().replace(/(?:^|\s)\S/g, function (char) {

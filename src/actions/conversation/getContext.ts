@@ -10,13 +10,13 @@ import getChatGPTResponse from "./chatGPT";
 
 const getContext = async (req: Request): Promise<ArjunResponse[]> => {
 
-    let response: ArjunResponse[] = [];
+    const response: ArjunResponse[] = [];
     // const token=await oauth2Client.refreshAccessToken();
     // console.log(token.credentials.access_token);
 
     const chatGPTResponse = await getChatGPTResponse(req.user.chatHistory, req);
     if (chatGPTResponse) {
-        let scheduleInfo = isJSONPresent(chatGPTResponse);
+        const scheduleInfo = isJSONPresent(chatGPTResponse);
         if (scheduleInfo.isJson && scheduleInfo.data) {
             const oauth2Client = new google.auth.OAuth2({
                 clientId: environmentVariables.googleOauthClientID,

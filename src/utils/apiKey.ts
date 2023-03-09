@@ -1,5 +1,4 @@
 import { Response, NextFunction, Request } from "express";
-import { pgPool } from "./sessionManager";
 import supabase from "./supabaseClient";
 
 const checkApiKey=async (req: Request, res: Response, next: NextFunction) => {
@@ -15,10 +14,11 @@ const checkApiKey=async (req: Request, res: Response, next: NextFunction) => {
 
             try {
 
-                let { data, error, status }=await supabase
+                const { data, error, status }=await supabase
                     .from("api_keys")
                     .select(`id, key, owner`)
                     .eq("owner", owner)
+                    .eq("key", apiKey)
                     .single();
 
                 if ((error&&status!==406)||data===null) {
