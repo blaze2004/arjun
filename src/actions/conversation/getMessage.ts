@@ -78,6 +78,33 @@ const getMessage=async (req: Request, res: Response) => {
                 return res.status(200).send(response);
             }
 
+            try {
+
+                const { data, error, status }=await supabase
+                    .from("profiles")
+                    .select(`full_name, phone_number, google_refresh_token`)
+                    .eq("phone_number", message.phone)
+                    .single();
+
+                if (error&&status!==406) {
+                    console.error(error);
+                    const response: ArjunResponse[]=[{ owner: req.body.owner, isReply: false, message: replies.internalErrorMessage as string }];
+                    return res.status(200).send(response);
+                }
+                if (data) {
+                    req.user.refreshToken=data.google_refresh_token||req.user.refreshToken;
+                }
+                else {
+                    const response: ArjunResponse[]=[{ owner: req.body.owner, isReply: false, message: replies.unregisteredUser as string }];
+                    return res.status(200).send(response);
+                }
+
+            } catch (error) {
+                console.error(error);
+                const response: ArjunResponse[]=[{ owner: req.body.owner, isReply: false, message: replies.internalErrorMessage as string }];
+                return res.status(200).send(response);
+            }
+
             req.user.chatHistory.push(
                 { role: 'user', content: message.body }
             );
@@ -115,9 +142,6 @@ const getMessage=async (req: Request, res: Response) => {
 
             // get context from user message and initiate appropriate process
             const response=await getContext(req);
-            response.forEach((reply: ArjunResponse) => {
-                req.user.chatHistory.push({ role: 'assistant', content: reply.message });
-            });
             await req.saveUserSession(req.user);
             return res.status(200).send(response);
         }
