@@ -58,7 +58,7 @@ export const getChatGPTResponse = async (prompt: ChatCompletionRequestMessage[],
     });
     return response.data.choices[0].message?.content;
   } catch (error) {
-    console.log(error);
+    console.log("ChatGPT API error", error);
     return undefined;
   }
 }

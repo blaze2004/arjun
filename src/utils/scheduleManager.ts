@@ -28,20 +28,47 @@ class ScheduleManager {
   public async getSchedule({ date = getTodayDate(), eventsOnly = false, tasksOnly = false, all = true }: ScheduleViewInfo): Promise<ScheduleElement[]> {
 
     let userSchedule: ScheduleElement[] = [];
+    let calendarList: string[] = [];
+
+    if (!tasksOnly) {
+      calendarList = await this.getCalendars();
+    }
 
     if (eventsOnly) {
-      userSchedule = userSchedule.concat(await this.getEvents(date));
+      for (let i = 0; i < calendarList.length; i++) {
+        userSchedule = userSchedule.concat(await this.getEvents(date, calendarList[i]));
+      }
     } else if (tasksOnly) {
       userSchedule = userSchedule.concat(await this.getTasks(date));
     } else {
-      userSchedule = userSchedule.concat(await this.getEvents(date));
+      for (let i = 0; i < calendarList.length; i++) {
+        userSchedule = userSchedule.concat(await this.getEvents(date, calendarList[i]));
+      }
       userSchedule = userSchedule.concat(await this.getTasks(date));
     }
-
     return userSchedule;
   }
 
-  private async getEvents(date: string): Promise<ScheduleElement[]> {
+  private async getCalendars(): Promise<string[]> {
+    const calendars = await this.calendar.calendarList.list({
+      auth: this.auth,
+      maxResults: 20,
+    });
+
+    const calendarList: string[] = [];
+
+    if (calendars.data.items) {
+      calendars.data.items.forEach((calendar) => {
+        if (calendar.id) {
+          calendarList.push(calendar.id);
+        }
+      })
+    }
+
+    return calendarList;
+  }
+
+  private async getEvents(date: string, calendarId: string): Promise<ScheduleElement[]> {
     const minTime = convertDateTimeToISO(date).slice(0, 10) + "T00:00:00.000Z";
     const maxTime = new Date((new Date(minTime)).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + "T00:00:00.000Z";
 
@@ -49,7 +76,7 @@ class ScheduleManager {
 
     const events = await this.calendar.events.list({
       auth: this.auth,
-      calendarId: 'primary',
+      calendarId: calendarId,
       timeMin: minTime,
       timeMax: maxTime,
       maxResults: 20,
@@ -72,8 +99,6 @@ class ScheduleManager {
         }
       });
     }
-
-    console.log(eventsList);
 
     return eventsList;
   }
@@ -99,7 +124,7 @@ class ScheduleManager {
           taskList.push({
             title: task.title,
             dueDate: due.toLocaleString('en-US', { dateStyle: 'short' }),
-            dueTime: due.toLocaleString('en-US', { timeStyle: 'short' }),
+            dueTime: '',
             type: 'task'
           });
         }
