@@ -1,27 +1,29 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import session from 'express-session';
-import getMessage from './actions/conversation/getMessage';
-import { sessionConfig, sessionMiddleware } from './utils/sessionManager';
+import { sessionConfig } from './utils/sessionManager';
 import environmentVariables from './utils/config';
-import bodyParser from 'body-parser';
 import checkApiKey from './utils/apiKey';
+import router from './routes';
+import { sessionMiddleware } from './middleware/sessions';
+import validate from './validator/validateResources';
+import { messageReqSchema } from './schema/user.schema';
+const app = express();
 
-const app=express();
+app.use(express.json());
 
-app.use(bodyParser.json());
+app.use(validate(messageReqSchema));
 
 // Session Middleware
 app.use(session(sessionConfig));
 app.use(sessionMiddleware);
 
 // API Check Middleware
-app.use(checkApiKey)
+app.use(checkApiKey);
 
-app.get("/api/v1", (_req: Request, res: Response) => {
-  return res.send("Arjun v1.0.0");
-});
-
-app.post("/api/v1/chat", getMessage);
+// Using router
+app.use(router);
 
 // Start the server
-app.listen(environmentVariables.port, () => console.log("Server is up and running!"));
+app.listen(environmentVariables.port, () =>
+  console.log('Server is up and running!')
+);
