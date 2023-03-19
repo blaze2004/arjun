@@ -2,7 +2,7 @@ import { Response, NextFunction, Request } from 'express';
 import { MessageRequestType } from '../types';
 import supabase from './supabaseClient';
 
-const checkApiKey = async (req: Request<{}, {}, MessageRequestType>, res: Response, next: NextFunction) => {
+const checkApiKey = async (req: Request<any, any, MessageRequestType>, res: Response, next: NextFunction) => {
   if (req.headers['x-api-key']) {
     const apiKey = req.headers['x-api-key'];
     const owner = req.body.owner;

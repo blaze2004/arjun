@@ -13,7 +13,7 @@ export const saveUserSession = (req: Request) => (user: User) => {
 };
 
 export const sessionMiddleware = async (
-  req: Request<{}, {}, MessageRequestType>,
+  req: Request<any, any, MessageRequestType>,
   _: Response,
   next: NextFunction
 ) => {
