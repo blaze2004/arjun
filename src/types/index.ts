@@ -1,5 +1,10 @@
 import { ChatCompletionRequestMessage } from 'openai';
 
+export type MessageRequestType = {
+  owner: string;
+  messageObj: MessageObject;
+};
+
 export interface MessageObject {
   phone: string;
   name?: string;

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { SessionData } from 'express-session';
-import { User } from '../types';
+import { MessageRequestType, User } from '../types';
 
 export const saveUserSession = (req: Request) => (user: User) => {
   req.session.user = user;
@@ -13,7 +13,7 @@ export const saveUserSession = (req: Request) => (user: User) => {
 };
 
 export const sessionMiddleware = async (
-  req: Request,
+  req: Request<{}, {}, MessageRequestType>,
   _: Response,
   next: NextFunction
 ) => {
