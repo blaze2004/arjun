@@ -1,7 +1,8 @@
 import { Response, NextFunction, Request } from 'express';
+import { MessageRequestType } from '../types';
 import supabase from './supabaseClient';
 
-const checkApiKey = async (req: Request, res: Response, next: NextFunction) => {
+const checkApiKey = async (req: Request<{}, {}, MessageRequestType>, res: Response, next: NextFunction) => {
   if (req.headers['x-api-key']) {
     const apiKey = req.headers['x-api-key'];
     const owner = req.body.owner;
@@ -23,6 +24,9 @@ const checkApiKey = async (req: Request, res: Response, next: NextFunction) => {
       console.error(error);
       return res.status(500).json({ message: 'Internal server error' });
     }
+  }
+  else {
+  return res.status(401).json({ message: 'API key missing' });
   }
 };
 

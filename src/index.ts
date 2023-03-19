@@ -5,10 +5,13 @@ import environmentVariables from './utils/config';
 import checkApiKey from './utils/apiKey';
 import router from './routes';
 import { sessionMiddleware } from './middleware/sessions';
-
+import validate from './validator/validateResources';
+import { messageReqSchema } from './schema/user.schema';
 const app = express();
 
 app.use(express.json());
+
+app.use(validate(messageReqSchema));
 
 // Session Middleware
 app.use(session(sessionConfig));
