@@ -26,7 +26,7 @@ const checkApiKey = async (req: Request<{}, {}, MessageRequestType>, res: Respon
     }
   }
   else {
-  return res.status(401).json({ message: 'API key missing' });
+    return res.status(401).json({ message: 'API key missing' });
   }
 };
 

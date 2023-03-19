@@ -32,7 +32,7 @@ export const sessionConfig: SessionOptions = {
   saveUninitialized: false,
   store: sessionStore,
   cookie: {
-    maxAge: 100 * 365 * 24 * 60 * 60 * 1000,
+    maxAge: 1 * 365 * 24 * 60 * 60 * 1000,
     secure: environmentVariables.nodeEnv === 'production',
   },
 };
