@@ -15,20 +15,21 @@ export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], re
             "tasksOnly": false,
             "eventsOnly": false,
             "all": true,
+            "date": "${getTodayDate()}",
             "message": "Your upcoming tasks and events"
             }`},
     {
-      role: 'user', content: 'schedule a meet with kane after 3 days in evening'
+      role: 'user', content: 'schedule a meet with kane today in evening'
     },
     {
       role: 'assistant',
       content: `{
                 "type": "schedule#add",
                 "subType": "event",
-                "dueDate": "08/03/2023",
+                "dueDate": "${getTodayDate()}",
                 "time": "19:00",
                 "title": "Meet with Kane",
-                "message": "Meeting scheduled with Kane on 8th March at 7 PM"
+                "message": "Meeting scheduled with Kane on ${getTodayDate()} 7 PM"
                 }`
     },
     ...chatHistory,
@@ -36,14 +37,13 @@ export const getChatGPTPrompt = (chatHistory: ChatCompletionRequestMessage[], re
 
   let prompt = '';
   for (let i = chatGPTPrompt.length - 1; i > 0; i--) {
-    prompt += chatGPTPrompt[i].content;
-    if ((prompt.split(" ").length) > 2000) {
-      const newChatHistory: ChatCompletionRequestMessage[] = chatGPTPrompt.slice(i > 5 ? i - 1 : 5, -1);
+    prompt += chatGPTPrompt[i].content.trim();
+    if ((prompt.split(" ").length) * 2 > 2000) {
+      const newChatHistory: ChatCompletionRequestMessage[] = chatGPTPrompt.slice(i > 5 ? i - 1 : 5);
       req.user.chatHistory = newChatHistory;
       return newChatHistory;
     }
   }
-
   return chatGPTPrompt;
 }
 
@@ -54,7 +54,7 @@ export const getChatGPTResponse = async (prompt: ChatCompletionRequestMessage[],
       model: "gpt-3.5-turbo",
       messages: chatGPTPrompt,
       temperature: 0,
-      max_tokens: 1000
+      max_tokens: 600
     });
     return response.data.choices[0].message?.content;
   } catch (error) {

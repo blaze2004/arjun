@@ -29,7 +29,7 @@ export interface JsonPresentResponse {
   data?: ChatGPTScheduleInfo;
 }
 
-export interface ScheduleInfo {
+export interface ScheduleAddInfo {
   type: string;
   subType: string;
   dueDate: string;
@@ -38,15 +38,16 @@ export interface ScheduleInfo {
   message: string;
 }
 
-export interface ScheduleView {
+export interface ScheduleViewInfo {
   type: string;
   eventsOnly: boolean;
   tasksOnly: boolean;
   all: boolean;
+  date: string;
   message: string;
 }
 
-export type ChatGPTScheduleInfo = ScheduleInfo | ScheduleView;
+export type ChatGPTScheduleInfo = ScheduleAddInfo | ScheduleViewInfo;
 
 export interface AddToScheduleResponse {
   success: boolean;

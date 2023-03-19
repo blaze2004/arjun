@@ -18,8 +18,10 @@ export const ChatGPTRole = (dateString: string, timeString: string): string => {
             "tasksOnly": false,
             "eventsOnly": false,
             "all": true,
+            "date": "dd/mm/yyyy",
             "message": "Your upcoming tasks and events"
     }
+    date default to current date if not provided
     
     Schedule Add
     {
@@ -30,6 +32,7 @@ export const ChatGPTRole = (dateString: string, timeString: string): string => {
             "title": "Title collected from user",
             "message": "Your message to the user."
     }
+    date to asked from user, time defaults to current time if not provided.
     
     Today's Date(dd/mm/yyyy format): ${dateString}.
     Current Time(24-Hour format): ${timeString}`;

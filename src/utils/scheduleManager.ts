@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
-import { AddToScheduleResponse, ScheduleElement, ScheduleInfo } from "../types";
-import { convertDateTimeToISO } from "./messageBuilder";
+import { AddToScheduleResponse, ScheduleElement, ScheduleAddInfo, ScheduleViewInfo } from "../types";
+import { convertDateTimeToISO, getTodayDate } from "./messageBuilder";
 
 class ScheduleManager {
   private readonly calendar = google.calendar("v3");
@@ -12,7 +12,7 @@ class ScheduleManager {
     this.auth = auth;
   }
 
-  public async createCalendarEntry(scheduleInfo: ScheduleInfo): Promise<string> {
+  public async createCalendarEntry(scheduleInfo: ScheduleAddInfo): Promise<string> {
     let response: AddToScheduleResponse;
     if (scheduleInfo.subType === "event") {
       response = await this.createEvent(scheduleInfo);
@@ -25,28 +25,33 @@ class ScheduleManager {
     return response.message;
   }
 
-  public async getSchedule({ eventsOnly = false, tasksOnly = false }): Promise<ScheduleElement[]> {
+  public async getSchedule({ date = getTodayDate(), eventsOnly = false, tasksOnly = false, all = true }: ScheduleViewInfo): Promise<ScheduleElement[]> {
 
     let userSchedule: ScheduleElement[] = [];
 
     if (eventsOnly) {
-      userSchedule = userSchedule.concat(await this.getEvents());
+      userSchedule = userSchedule.concat(await this.getEvents(date));
     } else if (tasksOnly) {
-      userSchedule = userSchedule.concat(await this.getTasks());
+      userSchedule = userSchedule.concat(await this.getTasks(date));
     } else {
-      userSchedule = userSchedule.concat(await this.getEvents());
-      userSchedule = userSchedule.concat(await this.getTasks());
+      userSchedule = userSchedule.concat(await this.getEvents(date));
+      userSchedule = userSchedule.concat(await this.getTasks(date));
     }
 
     return userSchedule;
   }
 
-  private async getEvents(): Promise<ScheduleElement[]> {
+  private async getEvents(date: string): Promise<ScheduleElement[]> {
+    const minTime = convertDateTimeToISO(date).slice(0, 10) + "T00:00:00.000Z";
+    const maxTime = new Date((new Date(minTime)).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + "T00:00:00.000Z";
+
+    console.log(minTime, " ", maxTime);
+
     const events = await this.calendar.events.list({
       auth: this.auth,
       calendarId: 'primary',
-      timeMin: new Date().toISOString(),
-      timeMax: new Date(new Date().getTime() + 48 * 60 * 60 * 1000).toISOString(),
+      timeMin: minTime,
+      timeMax: maxTime,
       maxResults: 20,
       singleEvents: true,
       orderBy: 'startTime',
@@ -68,15 +73,20 @@ class ScheduleManager {
       });
     }
 
+    console.log(eventsList);
+
     return eventsList;
   }
 
-  private async getTasks(): Promise<ScheduleElement[]> {
+  private async getTasks(date: string): Promise<ScheduleElement[]> {
+    const minTime = convertDateTimeToISO(date).slice(0, 10) + "T00:00:00.000Z";
+    const maxTime = new Date((new Date(minTime)).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + "T00:00:00.000Z";
+
     const tasks = await this.tasks.tasks.list({
       auth: this.auth,
       tasklist: '@default',
-      dueMin: new Date().toISOString(),
-      dueMax: new Date(new Date().getTime() + 48 * 60 * 60 * 1000).toISOString(),
+      dueMin: minTime,
+      dueMax: maxTime,
       showCompleted: false,
     });
 
@@ -99,7 +109,7 @@ class ScheduleManager {
     return taskList;
   }
 
-  private async createTask(TaskInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
+  private async createTask(TaskInfo: ScheduleAddInfo): Promise<AddToScheduleResponse> {
     const task = {
       title: TaskInfo.title,
       due: convertDateTimeToISO(TaskInfo.dueDate, TaskInfo.time),
@@ -120,12 +130,9 @@ class ScheduleManager {
     }
   }
 
-  // Google doesn't support creation of reminders currently
-  // private async createReminder(ReminderInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
-  // TODO: Implement Reminder Creation
-  // }
+  // Google doesn't support creation of reminders through api currently
 
-  private async createEvent(EventInfo: ScheduleInfo): Promise<AddToScheduleResponse> {
+  private async createEvent(EventInfo: ScheduleAddInfo): Promise<AddToScheduleResponse> {
     const eventStartTime = new Date((new Date(convertDateTimeToISO(EventInfo.dueDate, EventInfo.time))).getTime() - 5.5 * 60 * 60 * 1000).toISOString();
     const eventEndTime = new Date((new Date(eventStartTime)).getTime() + 60 * 60 * 1000);
 
