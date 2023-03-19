@@ -17,7 +17,7 @@ export const sessionStore = new pgSessionStore({
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 const genId = (req: Request) => {
-  if (req.body.phone) {
+  if (req.body.messageObj.phone) {
     return req.body.messageObj.phone;
   } else {
     return randomUUID();
