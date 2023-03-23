@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 import { AddToScheduleResponse, ScheduleElement, ScheduleAddInfo, ScheduleViewInfo } from "../types";
 import { convertDateTimeToISO, getTodayDate } from "./messageBuilder";
+import replies from "../constants/replies";
 
 class ScheduleManager {
   private readonly calendar = google.calendar("v3");
@@ -14,18 +15,16 @@ class ScheduleManager {
 
   public async createCalendarEntry(scheduleInfo: ScheduleAddInfo): Promise<string> {
     let response: AddToScheduleResponse;
-    if (scheduleInfo.subType === "event") {
-      response = await this.createEvent(scheduleInfo);
-    } else if (scheduleInfo.subType === "task") {
+    if (scheduleInfo.subType === "task") {
       response = await this.createTask(scheduleInfo);
     } else {
-      response = await this.createTask(scheduleInfo);
+      response = await this.createEvent(scheduleInfo);
     }
 
     return response.message;
   }
 
-  public async getSchedule({ date = getTodayDate(), eventsOnly = false, tasksOnly = false, all = true }: ScheduleViewInfo): Promise<ScheduleElement[]> {
+  public async getSchedule({ date = getTodayDate(), eventsOnly = false, tasksOnly = false }: ScheduleViewInfo): Promise<ScheduleElement[]> {
 
     let userSchedule: ScheduleElement[] = [];
     let calendarList: string[] = [];
@@ -71,8 +70,6 @@ class ScheduleManager {
   private async getEvents(date: string, calendarId: string): Promise<ScheduleElement[]> {
     const minTime = convertDateTimeToISO(date).slice(0, 10) + "T00:00:00.000Z";
     const maxTime = new Date((new Date(minTime)).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10) + "T00:00:00.000Z";
-
-    console.log(minTime, " ", maxTime);
 
     const events = await this.calendar.events.list({
       auth: this.auth,
@@ -138,6 +135,7 @@ class ScheduleManager {
     const task = {
       title: TaskInfo.title,
       due: convertDateTimeToISO(TaskInfo.dueDate, TaskInfo.time),
+      notes: replies.calendarDescription as string,
     };
 
     try {
@@ -163,6 +161,7 @@ class ScheduleManager {
 
     const event = {
       summary: EventInfo.title,
+      description: replies.calendarDescription as string,
       start: {
         dateTime: eventStartTime,
         timeZone: 'Asia/Kolkata',
