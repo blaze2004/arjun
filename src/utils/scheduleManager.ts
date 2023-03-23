@@ -85,8 +85,15 @@ class ScheduleManager {
 
     if (events.data.items) {
       events.data.items.forEach((event) => {
-        if (event.summary && event.start && event.start.date) {
-          const start = new Date(event.start.date);
+        if (event.summary && event.start && (event.start.date || event.start.dateTime)) {
+          let start: Date;
+          if (event.start.date) {
+            start = new Date(event.start.date)
+          } else if (event.start.dateTime) {
+            start = new Date(event.start.dateTime)
+          } else {
+            return;
+          }
           eventsList.push({
             title: event.summary,
             dueDate: start.toLocaleString('en-US', { dateStyle: 'short' }),
