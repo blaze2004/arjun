@@ -87,17 +87,22 @@ class ScheduleManager {
       events.data.items.forEach((event) => {
         if (event.summary && event.start && (event.start.date || event.start.dateTime)) {
           let start: Date;
+          const dateOptions: Intl.DateTimeFormatOptions = { dateStyle: 'short' };
+          const timeOptions: Intl.DateTimeFormatOptions = { timeStyle: 'short' };
+
           if (event.start.date) {
-            start = new Date(event.start.date)
-          } else if (event.start.dateTime) {
-            start = new Date(event.start.dateTime)
+            start = new Date(event.start.date);
+          } else if (event.start.dateTime && event.start.timeZone) {
+            start = new Date(event.start.dateTime);
+            dateOptions.timeZone = event.start.timeZone;
+            timeOptions.timeZone = event.start.timeZone;
           } else {
             return;
           }
           eventsList.push({
             title: event.summary,
-            dueDate: start.toLocaleString('en-US', { dateStyle: 'short' }),
-            dueTime: start.toLocaleString('en-US', { timeStyle: 'short' }),
+            dueDate: start.toLocaleString('en-US', dateOptions),
+            dueTime: start.toLocaleString('en-US', timeOptions),
             type: 'event'
           })
         }
