@@ -1,11 +1,23 @@
 import * as yup from 'yup';
 
+export const ScheduleSchema = yup.object({
+  type: yup.string().required(),
+  message: yup.string().optional(),
+});
+
+export const MeetingAttendeeSchema = yup.object({
+  displayName: yup.string().default(""),
+  email: yup.string().email().required(),
+});
+
 export const scheduleAddSchema = yup.object({
   type: yup.string().required(),
   subType: yup.string().required(),
   dueDate: yup.string().required(),
+  isMeeting: yup.boolean().default(false),
   time: yup.string().optional(),
   title: yup.string().optional(),
+  attendees: yup.array(MeetingAttendeeSchema).required().default([]),
   message: yup.string().optional(),
 });
 
@@ -46,7 +58,9 @@ Schedule Add
   "subType": "event|task|reminder",
   "dueDate": "dd/mm/yyyy",
   "time": "HH:MM",
+  "isMeeting": true,
   "title": "Title collected from user",
+  "attendees": [{"displayName": "name of the attendee", "email": "email of attendee"}],
   "message": "Your message to the user."
 }
 */
