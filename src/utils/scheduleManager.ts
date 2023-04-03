@@ -1,8 +1,9 @@
-import { google } from "googleapis";
+import { calendar_v3, google } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
 import { AddToScheduleResponse, ScheduleElement, ScheduleAddInfo, ScheduleViewInfo } from "../types";
 import { convertDateTimeToISO, getTodayDate } from "./messageBuilder";
 import replies from "../constants/replies";
+import { randomUUID } from "crypto";
 
 class ScheduleManager {
   private readonly calendar = google.calendar("v3");
@@ -171,7 +172,7 @@ class ScheduleManager {
     const eventStartTime = new Date((new Date(convertDateTimeToISO(EventInfo.dueDate, EventInfo.time))).getTime() - 5.5 * 60 * 60 * 1000).toISOString();
     const eventEndTime = new Date((new Date(eventStartTime)).getTime() + 60 * 60 * 1000);
 
-    const event = {
+    const event: calendar_v3.Schema$Event = {
       summary: EventInfo.title,
       description: replies.calendarDescription as string,
       start: {
@@ -185,7 +186,19 @@ class ScheduleManager {
       reminders: {
         useDefault: true,
       },
+      attendees: EventInfo.attendees
     };
+
+    if (EventInfo.isMeeting) {
+      event.conferenceData = {
+        createRequest: {
+          requestId: randomUUID(),
+          conferenceSolutionKey: {
+            type: "hangoutsMeet"
+          },
+        }
+      }
+    }
 
     try {
       await this.calendar.events.insert({

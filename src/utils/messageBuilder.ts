@@ -1,4 +1,6 @@
+import { ScheduleSchema } from "../schema/schedule.schema";
 import { ChatGPTScheduleInfo, JsonPresentResponse, ScheduleAddInfo } from "../types";
+import { validateData } from "../validator/validateResources";
 
 export const toCapitalCase = (str: string): string => {
   return str.toLowerCase().replace(/(?:^|\s)\S/g, function (char) {
@@ -51,19 +53,30 @@ export const convertTo24HourFormat = (timeString: string): string => {
 
 export const isJSONPresent = (str: string): JsonPresentResponse => {
   try {
-    const jsonList = str.match(/\{[^{}]*\}/);
+    // const jsonRegex = /(?(DEFINE)(?<number>-?(?=[1-9]|0(?!\d))\d+(\.\d+)?([eE][+-]?\d+)?)(?<boolean>true|false|null)(?<string>"([^"\\]*|\\["\\bfnrt\/]|\\u[0-9a-f]{4})*")(?<array>\[(?:\s*(?&json)(?:,\s*(?&json))*)?\s*\])(?<pair>\s*(?&string)\s*:(?&json))(?<object>{(?:\s*(?&pair)(?:,\s*(?&pair))*)?\s*})(?<json>\s*(?:(?&number)|(?&boolean)|(?&string)|(?&array)|(?&object))\s*))(?&json)/gi
+    const jsonRegex = /\s*(\{[\s\S]*\}|\[[\s\S]*\])\s*/gi
+    const jsonList = str.match(jsonRegex);
 
     if (jsonList != null) {
-      const jsonString = jsonList[0].replace(/\bTrue\b|\bFalse\b/gi, match => match.toLowerCase());
-      console.log(jsonString);
-      let obj: ChatGPTScheduleInfo = JSON.parse(jsonString);
-      console.log(obj);
-      if (obj.type === "schedule#add") {
-        obj = obj as ScheduleAddInfo;
-        const time24Hour = convertTo24HourFormat(obj.time);
-        obj.time = time24Hour;
+      console.log(jsonList);
+      for (let i = 0; i < jsonList.length; i++) {
+        const jsonString = jsonList[i].replace(/\bTrue\b|\bFalse\b/gi, match => match.toLowerCase());
+        console.log(jsonString);
+        const jsonValue = JSON.parse(jsonString);
+        if (validateData(ScheduleSchema, jsonValue)) {
+          let obj: ChatGPTScheduleInfo = jsonValue;
+          console.log(obj);
+
+          if (obj.type === "schedule#add") {
+            obj = obj as ScheduleAddInfo;
+            const time24Hour = convertTo24HourFormat(obj.time);
+            obj.time = time24Hour;
+          }
+
+          return { isJson: true, data: obj };
+        }
+
       }
-      return { isJson: true, data: obj };
     }
     return { isJson: false };
   } catch (e) {
@@ -78,6 +91,12 @@ export const getTodayDate = (): string => {
   const yyyy = today.getFullYear();
   return dd + '/' + mm + '/' + yyyy;
 }
+
+export const getTodayDay = (): string => {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const today = new Date().getDay();
+  return days[today];
+};
 
 export const getCurrentTime = (): string => {
   const options = { timeZone: 'Asia/Kolkata', hour12: false };

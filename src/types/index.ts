@@ -34,8 +34,15 @@ export interface ScheduleAddInfo {
   subType: string;
   dueDate: string;
   time: string;
+  isMeeting: boolean;
   title: string;
+  attendees: AttendeeInfo[];
   message: string;
+}
+
+export interface AttendeeInfo {
+  displayName: string;
+  email: string;
 }
 
 export interface ScheduleViewInfo {

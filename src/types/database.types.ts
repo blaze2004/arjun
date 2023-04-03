@@ -12,17 +12,17 @@ export interface Database {
       api_keys: {
         Row: {
           id: number
-          key: string
+          key: string | null
           owner: string | null
         }
         Insert: {
           id?: number
-          key: string
+          key?: string | null
           owner?: string | null
         }
         Update: {
           id?: number
-          key?: string
+          key?: string | null
           owner?: string | null
         }
       }
@@ -33,8 +33,8 @@ export interface Database {
           google_refresh_token: string | null
           id: string
           phone_number: string | null
+          timeZone: string | null
           updated_at: string | null
-          waitlist_status: boolean
         }
         Insert: {
           avatar_url?: string | null
@@ -42,8 +42,8 @@ export interface Database {
           google_refresh_token?: string | null
           id: string
           phone_number?: string | null
+          timeZone?: string | null
           updated_at?: string | null
-          waitlist_status?: boolean
         }
         Update: {
           avatar_url?: string | null
@@ -51,8 +51,25 @@ export interface Database {
           google_refresh_token?: string | null
           id?: string
           phone_number?: string | null
+          timeZone?: string | null
           updated_at?: string | null
-          waitlist_status?: boolean
+        }
+      }
+      testers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: number
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: number
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: number
         }
       }
       user_sessions: {
