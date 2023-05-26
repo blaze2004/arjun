@@ -186,19 +186,27 @@ class ScheduleManager {
       reminders: {
         useDefault: true,
       },
-      attendees: EventInfo.attendees
-    };
-
-    if (EventInfo.isMeeting) {
-      event.conferenceData = {
+      attendees: EventInfo.attendees,
+      conferenceData: EventInfo.isMeeting ? {
         createRequest: {
           requestId: randomUUID(),
           conferenceSolutionKey: {
             type: "hangoutsMeet"
           },
         }
-      }
-    }
+      } : undefined
+    };
+
+    // if (EventInfo.isMeeting) {
+    //   event.conferenceData = {
+    //     createRequest: {
+    //       requestId: randomUUID(),
+    //       conferenceSolutionKey: {
+    //         type: "hangoutsMeet"
+    //       },
+    //     }
+    //   }
+    // }
 
     try {
       await this.calendar.events.insert({
